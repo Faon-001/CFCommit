@@ -1,16 +1,29 @@
 name: Codeforces Auto-Commit
+
 on:
-  # 🚫 Disabled automatic triggers
-  # schedule:
-  #   - cron: "*/15 * * * *"  # Disabled auto-run
-  workflow_dispatch:  # ✅ Only runs manually
+  schedule:
+    - cron: "0 */6 * * *"  # Runs every 6 hours (to avoid GitHub rate limits)
+  workflow_dispatch:       # Allows you to run it manually whenever you want
 
 jobs:
   fetch-and-commit:
-    if: false  # 🚫 Prevent job from running at all
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Do nothing
-        run: echo "Auto commit temporarily disabled."
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run Sync Script
+        env:
+          CF_HANDLE: ${{ vars.CF_HANDLE }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          # This assumes the fork has a script named 'main.py' or similar. 
+          # If the original repo used a specific command, use that here.
+          python main.py
